@@ -1,7 +1,7 @@
 # SwiftUIAssignment
 SwiftUI assignment with Clean + mvvm architecture
 
-Product Catalog App (SwiftUI + SwiftData)
+Product App (SwiftUI + SwiftData)
 A robust iOS application demonstrating modern architectural patterns using Clean Architecture, MVVM, and Offline-First data synchronization.
 
 Architecture Overview
