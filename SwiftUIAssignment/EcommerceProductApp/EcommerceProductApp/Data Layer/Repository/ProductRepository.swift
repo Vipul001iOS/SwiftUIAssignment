@@ -8,8 +8,15 @@ class ProductRepository: ProductListRepositoryProtocol {
     private let networkMonitor: NetworkMonitorProtocol
     
     init(modelContext: ModelContext,
-         apiService: APIServiceProtocol = APIManager(),
-         networkMonitor: NetworkMonitorProtocol = NetworkMonitor.shared) {
+         apiService: APIServiceProtocol = APIManager()) {
+        self.modelContext = modelContext
+        self.apiService = apiService
+        self.networkMonitor = NetworkMonitor.shared
+    }
+
+    init(modelContext: ModelContext,
+         apiService: APIServiceProtocol,
+         networkMonitor: NetworkMonitorProtocol) {
         self.modelContext = modelContext
         self.apiService = apiService
         self.networkMonitor = networkMonitor
@@ -19,8 +26,9 @@ class ProductRepository: ProductListRepositoryProtocol {
         let descriptor = FetchDescriptor<ProductEntity>(sortBy: [SortDescriptor(\.id)])
         let localData = try modelContext.fetch(descriptor)
         
-        if !networkMonitor.isConnected {
-            if localData.isEmpty { throw ApiError.noData }
+        let isConnected = await networkMonitor.currentConnectionStatus()
+        if !isConnected {
+            if localData.isEmpty { throw ApiError.networkError }
             return localData
         }
         do {
