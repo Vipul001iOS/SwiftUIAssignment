@@ -36,6 +36,20 @@ final class ProductEntity {
         self.rate = dto.rating.rate
         self.count = dto.rating.count
     }
+
+    func toProduct() -> Product {
+        Product(
+            id: id,
+            title: title,
+            price: price,
+            descriptionText: descriptionText,
+            image: image,
+            category: category,
+            rate: rate,
+            count: count,
+            cacheImageData: cacheImageData
+        )
+    }
 }
 
 @MainActor

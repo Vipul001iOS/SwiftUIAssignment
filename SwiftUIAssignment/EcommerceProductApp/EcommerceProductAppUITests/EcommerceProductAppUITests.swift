@@ -6,15 +6,30 @@ final class EcommerceProductAppUITests: XCTestCase {
     
     override func setUpWithError() throws {
         continueAfterFailure = false
+        app.launchArguments = ["--ui-testing"]
         app.launch()
     }
     
     func testProductListAppear() {
-        let navigationTitle = app.staticTexts["Product"]
-        XCTAssertTrue(navigationTitle.waitForExistence(timeout: 5), "The product screen title appear")
+        let navigationTitle = app.navigationBars["Product List"]
+        XCTAssertTrue(navigationTitle.waitForExistence(timeout: 5), "The product screen title should appear")
+        XCTAssertTrue(app.collectionViews["productList"].waitForExistence(timeout: 5), "Product list should appear")
+        XCTAssertTrue(app.buttons["productListItem_1"].waitForExistence(timeout: 5), "First product row should appear")
+    }
+
+    func testCanSwitchBetweenListAndGridLayout() {
         let productList = app.collectionViews["productList"]
-        let firstCell = app.staticTexts.element(boundBy: 0)
-        XCTAssertTrue(firstCell.waitForExistence(timeout: 10), "Product list should show at least one item")
+        XCTAssertTrue(productList.waitForExistence(timeout: 5), "Product list should appear first")
+
+        let layoutPicker = app.segmentedControls["layoutModePicker"]
+        XCTAssertTrue(layoutPicker.waitForExistence(timeout: 5), "Layout picker should appear in the header")
+
+        layoutPicker.buttons.element(boundBy: 1).tap()
+        XCTAssertTrue(app.scrollViews["productGrid"].waitForExistence(timeout: 5), "Product grid should appear after selecting grid mode")
+        XCTAssertTrue(app.buttons["productGridItem_1"].waitForExistence(timeout: 5), "First product should still be visible in grid mode")
+
+        layoutPicker.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.collectionViews["productList"].waitForExistence(timeout: 5), "Product list should appear after selecting list mode")
     }
     
     @MainActor

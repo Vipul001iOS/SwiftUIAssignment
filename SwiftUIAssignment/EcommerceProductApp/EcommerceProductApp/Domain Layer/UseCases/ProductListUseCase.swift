@@ -1,6 +1,5 @@
 import Foundation
 
-@MainActor
 class ProductListUseCase: ProductListUseCaseProtocol {
     private let productRepository: ProductListRepositoryProtocol
     
@@ -8,7 +7,7 @@ class ProductListUseCase: ProductListUseCaseProtocol {
         self.productRepository = productRepository
     }
     
-    func getProductList() async throws -> [ProductEntity] {
+    func getProductList() async throws -> [Product] {
         return try await productRepository.getProductsList()
     }
 }

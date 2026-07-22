@@ -3,12 +3,12 @@ import Foundation
 @MainActor
 class ProductListViewModel: ObservableObject {
     
-    @Published var products: [ProductEntity] = []
+    @Published var products: [Product] = []
     @Published var isLoading: Bool = false
     @Published var networkError: ApiError? = nil
-    private let productUseCase: ProductListUseCase
+    private let productUseCase: ProductListUseCaseProtocol
     
-    init(productUseCase: ProductListUseCase) {
+    init(productUseCase: ProductListUseCaseProtocol) {
         self.productUseCase = productUseCase
     }
     

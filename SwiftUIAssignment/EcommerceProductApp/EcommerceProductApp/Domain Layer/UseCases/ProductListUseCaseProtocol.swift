@@ -1,3 +1,3 @@
 protocol ProductListUseCaseProtocol {
-    func getProductList() async throws -> [ProductEntity]
+    func getProductList() async throws -> [Product]
 }

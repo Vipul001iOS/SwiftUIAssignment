@@ -22,14 +22,14 @@ class ProductRepository: ProductListRepositoryProtocol {
         self.networkMonitor = networkMonitor
     }
     
-    func getProductsList() async throws -> [ProductEntity] {
+    func getProductsList() async throws -> [Product] {
         let descriptor = FetchDescriptor<ProductEntity>(sortBy: [SortDescriptor(\.id)])
         let localData = try modelContext.fetch(descriptor)
         
         let isConnected = await networkMonitor.currentConnectionStatus()
         if !isConnected {
             if localData.isEmpty { throw ApiError.networkError }
-            return localData
+            return localData.map { $0.toProduct() }
         }
         do {
             let apiData: [ProductDTO] = try await apiService.request(url: API.productsURL)
@@ -44,10 +44,10 @@ class ProductRepository: ProductListRepositoryProtocol {
             }
             
             try modelContext.save()
-            return try modelContext.fetch(descriptor)
+            return try modelContext.fetch(descriptor).map { $0.toProduct() }
             
         } catch {
-            if !localData.isEmpty { return localData }
+            if !localData.isEmpty { return localData.map { $0.toProduct() } }
             throw ApiError.noData
         }
     }

@@ -3,7 +3,7 @@ import SwiftUI
 import Foundation
 
 struct ProductListCell: View {
-    let product: ProductEntity
+    let product: Product
     
     var body: some View {
         HStack {
@@ -17,9 +17,6 @@ struct ProductListCell: View {
                         case .success(let image):
                             image
                                 .resizable()
-                                .onAppear {
-                                    downloadAndSave(url: product.image)
-                                }
                         case .failure(_):
                             Image(systemName: "photo")
                         case .empty:
@@ -53,17 +50,5 @@ struct ProductListCell: View {
         .listRowSeparator(.hidden)
         .listRowBackground(Color.clear)
         
-    }
-    
-    func downloadAndSave(url: String) {
-        guard let imageUrl = URL(string: url) else { return }
-        Task {
-            do {
-                let (data, _) = try await URLSession.shared.data(from: imageUrl)
-                product.storeImageLocally(data: data)
-            } catch {
-                print("Error cacheing image here: \(error)")
-            }
-        }
     }
 }

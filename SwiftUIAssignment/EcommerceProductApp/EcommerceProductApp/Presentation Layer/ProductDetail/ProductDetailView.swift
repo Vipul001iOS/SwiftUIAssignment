@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ProductDetailView: View {
-    let productDetail: ProductEntity
+    let productDetail: Product
     var body: some View {
         GeometryReader { geometry in
             ScrollView {
@@ -14,9 +14,6 @@ struct ProductDetailView: View {
                             AsyncImage(url: URL(string: productDetail.image)) { result in
                                 if let image = result.image {
                                     image.resizable()
-                                        .onAppear {
-                                            productDetail.loadAndSaveImage()
-                                        }
                                 } else {
                                     ProgressView()
                                 }
@@ -65,5 +62,17 @@ struct ProductDetailView: View {
 }
 
 #Preview {
-    ProductDetailView(productDetail: ProductEntity(from: ProductDTO(id: 1, title: "Test", price: 100.00, description: "test description", category: "Cloths", image: "test.png", rating: Rating(rate: 4.5, count: 5))))
+    ProductDetailView(
+        productDetail: Product(
+            id: 1,
+            title: "Test",
+            price: 100.00,
+            descriptionText: "test description",
+            image: "test.png",
+            category: "Cloths",
+            rate: 4.5,
+            count: 5,
+            cacheImageData: nil
+        )
+    )
 }

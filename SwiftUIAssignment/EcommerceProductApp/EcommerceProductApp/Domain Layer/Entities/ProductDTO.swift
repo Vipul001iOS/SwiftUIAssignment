@@ -1,5 +1,17 @@
 import Foundation
 
+struct Product: Identifiable, Hashable, Sendable {
+    let id: Int
+    let title: String
+    let price: Double
+    let descriptionText: String
+    let image: String
+    let category: String
+    let rate: Double
+    let count: Int
+    let cacheImageData: Data?
+}
+
 struct ProductDTO: Codable {
     let id: Int
     let title: String

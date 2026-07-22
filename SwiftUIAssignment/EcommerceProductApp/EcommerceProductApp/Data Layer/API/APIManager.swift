@@ -12,28 +12,35 @@ public final class APIManager: APIServiceProtocol {
     }
     
     public func request<T: Decodable>(url: String) async throws -> T {
-        guard let finalUrl = URL(string: API.productsURL) else {
+        guard let finalUrl = URL(string: url) else {
             throw ApiError.invalidUrl
         }
+
         var request = URLRequest(url: finalUrl)
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await session.data(for: request)
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw ApiError.unKnownError
             }
-            guard let httpStatusCode = (response as? HTTPURLResponse)?.statusCode, (200..<300).contains(httpStatusCode) else {
+
+            guard (200..<300).contains(httpResponse.statusCode) else {
                 throw ApiError.serverError(httpResponse.statusCode)
             }
+
             guard !data.isEmpty else {
                 throw ApiError.noData
             }
+
             do {
                 return try JSONDecoder().decode(T.self, from: data)
-            }catch let error as ApiError{
-                throw error
+            } catch {
+                throw ApiError.decodingError
             }
-        }catch {
+        } catch let error as ApiError {
+            throw error
+        } catch {
             throw ApiError.unKnownError
         }
     }

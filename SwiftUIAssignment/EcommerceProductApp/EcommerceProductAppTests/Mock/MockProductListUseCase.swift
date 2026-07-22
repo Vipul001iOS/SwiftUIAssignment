@@ -2,14 +2,15 @@ import XCTest
 import SwiftData
 @testable import EcommerceProductApp
 
-class MockProductListUseCase: ProductListUseCase {
-    var shouldReturnError = false
+class MockProductListUseCase: ProductListUseCaseProtocol {
+    var errorToThrow: Error?
+    var products = [ProductEntity(from: .mock()).toProduct()]
     
-    func execute() async throws -> [ProductEntity] {
-        if shouldReturnError {
-            throw NSError(domain: "test error", code: 0)
+    func getProductList() async throws -> [Product] {
+        if let errorToThrow {
+            throw errorToThrow
         }
-        return [ProductEntity(from: .mock())]
+        return products
     }
 }
 

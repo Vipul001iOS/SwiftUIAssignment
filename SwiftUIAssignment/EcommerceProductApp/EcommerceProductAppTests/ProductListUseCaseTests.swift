@@ -19,8 +19,8 @@ final class ProductListUseCaseTests: XCTestCase {
     }
 
     func testExecute_WhenRepositoryReturnsData_Success() async throws {
-        let mockEntity = ProductEntity(from: .mock())
-        mockRepository.result = .success([mockEntity])
+        let mockProduct = ProductEntity(from: .mock()).toProduct()
+        mockRepository.result = .success([mockProduct])
         let products = try await sut.getProductList()
         XCTAssertEqual(products.count, 1)
         XCTAssertEqual(products.first?.title, "test")

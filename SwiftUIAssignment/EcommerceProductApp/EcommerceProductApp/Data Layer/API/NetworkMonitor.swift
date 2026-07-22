@@ -7,8 +7,9 @@ final class NetworkMonitor: NetworkMonitorProtocol {
 
     private let queue = DispatchQueue(label: "NetworkMonitorQueue")
     private let monitor = NWPathMonitor()
+    private let statusCheckDelayNanoseconds: UInt64 = 50_000_000
+    private let maxInitialStatusChecks = 10
     private var hasReceivedStatus = false
-    private var statusContinuations: [CheckedContinuation<Bool, Never>] = []
 
     private(set) var isConnected: Bool = false
 
@@ -29,9 +30,21 @@ final class NetworkMonitor: NetworkMonitorProtocol {
             return isConnected
         }
 
-        return await withCheckedContinuation { continuation in
-            statusContinuations.append(continuation)
+        for _ in 0..<maxInitialStatusChecks {
+            if Task.isCancelled {
+                return isConnected
+            }
+
+            try? await Task.sleep(nanoseconds: statusCheckDelayNanoseconds)
+
+            if hasReceivedStatus {
+                return isConnected
+            }
         }
+
+        let currentStatus = monitor.currentPath.status == .satisfied
+        updateConnectionStatus(currentStatus)
+        return isConnected
     }
 
     private func updateConnectionStatus(_ status: Bool) {
@@ -41,9 +54,6 @@ final class NetworkMonitor: NetworkMonitorProtocol {
             isConnected = status
             print("Network status changed: \(status)")
         }
-
-        statusContinuations.forEach { $0.resume(returning: status) }
-        statusContinuations.removeAll()
     }
 
     deinit {
